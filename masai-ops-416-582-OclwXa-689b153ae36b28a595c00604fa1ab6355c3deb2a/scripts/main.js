@@ -29,29 +29,32 @@ loginUserButton.onclick = async () => {
   try { 
     let obj = {
       username: loginUserUsername.value,
-      passowrd: loginUserPassword.value,
+      password: loginUserPassword.value,
     };
      console.log(obj);
-    let res = await fetch(userLoginURL, {
+     let res = await fetch(userLoginURL, { 
       method: "POST",
       body: JSON.stringify(obj),
       headers: {
         "Content-Type": "application/json",
       },
     });
+    
+    // console.log(res.ok);
+    if(res.ok){
+      notificationWrapper.innerHTML = `<h5 class="notification info">
+    hey ${loginUserUsername.value}, welcome back!
+    </h5>`;
+    res = await res.json();
     console.log(res);
-    // if (res.ok) {
-    //   alert(`hey ${username}, welcome back!`);
-    // }
-
-    // notificationWrapper.innerHTML = `<h5 class="notification info">
-    // hey ${username}, welcome back!
-    // </h5>`;
-    // let token = await res.json();
-    // userAuthToken = token.accessToken;
-    // userId = token.id;
-  } catch (error) {
-    alert("bad request");
+    userAuthToken = res.accessToken;
+    // console.log(userAuthToken);
+    userId = res.user.id;
+    localStorage.setItem('userId',userId)
+    // console.log(userId);
+    }
+  }catch (error) {
+    console.log(error);
   }
 };
 
@@ -64,23 +67,38 @@ getTodoButton.onclick = async () => {
     }
   })
 
-  let data = res.json();
+  let data = await res.json();
   console.log(data);
+
+  renderTodo(data)
+  
 }
 
-
-// const fetchData = async () => {
-//   let res = await fetch(urlAllTodosOfUser, {
-//     method: "GET",
-//     headers: {
-//       'Content-Type': 'application/json',
-//       'Authorization': `Bearer ${userAuthToken}`
-//     }
-//   })
-
-//   let data = res.json();
-//   console.log(data);
-
+const renderTodo = (data) => {
   
-// }
+  mainSection.innerHTML = null;
+
+  data.forEach( (el) => {
+
+   
+    mainSection.innerHTML = `<div id="todo-list-wrapper" class="todo-list-wrapper">
+    </div>
+    `
+
+    if(el.completed){
+      document.getElementById('todo-list-wrapper').innerHTML=`<label><input class="todo-item-checkbox" data-id=${el.id} type="checkbox" checked="">${el.title}</label>`
+    }else{
+      document.getElementById('todo-list-wrapper').innerHTML=`<label><input class="todo-item-checkbox" data-id=${el.id} type="checkbox">${el.title}</label>`
+    }
+
+    // let div = document.createElement('div')
+
+    // let label = document.createElement("label")
+    // let input = document.createElement('input')
+    
+    // div.append(input)
+    // mainSection.append(div)
+
+  })
+}
 
